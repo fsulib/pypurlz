@@ -63,8 +63,6 @@ def exec(host, username, password, purl_csv):
             target_check = requests.get(target)
             if target_check.status_code != 200:
                 print('Target is not a valid URL')
-            else:
-                print('Target is valid URL')
             output = subprocess.check_output("./create_single_purl.py --host {host} --username {username} --password {password} --domain {domain}  --id {id} --target {target}".format(host=host, username=username, password=password, domain=domain, id=id, target=target), shell=True)
             output = output.decode("utf-8").strip().split(' | ')
             results_row = [domain, id, target, output[0], output[1]]
