@@ -32,34 +32,26 @@ def exec(host, username, password, purl_csv):
         next(reader)
         data = list(reader)
         all_row_count = len(data)
+        validity_rowcount = 0
         rowcount = 0
+    with open(purl_csv, "r") as csv_validity_check:
+        csv_scan = DictReader(csv_validity_check)
+        for row in csv_scan:
+            validity_rowcount+=1
+            purl_id = row['id']
+            illegal_chars = [' ','#','$','%','^','&','(',')','<','>']
+            illegal_chars_set = set(illegal_chars)
+            purl_id_set = set(purl_id)
+            set_intersection = illegal_chars_set.isdisjoint(purl_id_set)
+            if set_intersection == False:
+                sys.exit('This .csv contains spaces or illegal characters in row {validity_rowcount}. Check .csv and try again'.format(validity_rowcount=validity_rowcount+1))
     with open(purl_csv, 'r') as read_obj:
         csv_dict_reader = DictReader(read_obj)
         for row in csv_dict_reader:
-            rowcount+= 1
             domain = row['domain']
             id = row['id']
             target = row['target']
-            if " " in id:
-                print('ID {id} in row {rowcount} contains spaces. It is invalid!'.format(id=id, rowcount=rowcount+1))
-            if "#" in id:
-                print('ID {id} in row {rowcount} contains special character, #. It is invalid!'.format(id=id, rowcount=rowcount+1))
-            if "$" in id:
-                print('WARNING: Id {id} in row {rowcount} contains special character, $. This will write a PURL with the wrong ID! Remove the special character.'.format(id=id, rowcount=rowcount+1))
-            if "%" in id:
-                print('ID {id} in row {rowcount} contains special character, %. It is invalid!'.format(id=id, rowcount=rowcount+1))
-            if "^" in id:
-                print('ID {id} in row {rowcount} contains special character, ^. It is invalid!'.format(id=id, rowcount=rowcount+1))
-            if "&" in id:
-                print('ID {id} in row {rowcount} contains special character, &. It is invalid!'.format(id=id, rowcount=rowcount+1))
-            if "(" in id:
-                print('ID {id} in row {rowcount} contains special character, (. It is invalid!'.format(id=id, rowcount=rowcount+1))
-            if ")" in id:
-                print('ID {id} in row {rowcount} contains special character, ). It is invalid!'.format(id=id, rowcount=rowcount+1))
-            if "<" in id:
-                print('ID {id} in row {rowcount} contains special character, <. It is invalid!'.format(id=id, rowcount=rowcount+1))
-            if ">" in id:
-                print('ID {id} in row {rowcount} contains special character, >. It is invalid!'.format(id=id, rowcount=rowcount+1))
+            rowcount += 1
             target_check = requests.get(target)
             if target_check.status_code != 200:
                 print('Target is not a valid URL')
