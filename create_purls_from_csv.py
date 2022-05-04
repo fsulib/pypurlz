@@ -36,15 +36,31 @@ def exec(host, username, password, purl_csv):
         rowcount = 0
     with open(purl_csv, "r") as csv_validity_check:
         csv_scan = DictReader(csv_validity_check)
+        validity_errors = []
+        illegal_chars = [' ','#','$','%','^','&','(',')','<','>']
+        illegal_chars_set = set(illegal_chars)
         for row in csv_scan:
             validity_rowcount+=1
             purl_id = row['id']
-            illegal_chars = [' ','#','$','%','^','&','(',')','<','>']
-            illegal_chars_set = set(illegal_chars)
             purl_id_set = set(purl_id)
-            set_intersection = illegal_chars_set.isdisjoint(purl_id_set)
-            if set_intersection == False:
-                sys.exit('This .csv contains spaces or illegal characters in row {validity_rowcount}. Check .csv and try again'.format(validity_rowcount=validity_rowcount+1))
+            detected_illegal_chars = illegal_chars_set.intersection(purl_id_set)
+            if len(detected_illegal_chars) != 0:
+              detected_illegal_chars_string = ''
+              for num, char in enumerate(detected_illegal_chars, start=1):
+                if num == 1:
+                  pad = ''
+                  plural = ''
+                else:
+                  pad = ', '
+                  plural = 's'
+                detected_illegal_chars_string = detected_illegal_chars_string + pad + char
+              validity_errors.append('Line {line}: Contains illegal character{plural} {characters}'.format(line = validity_rowcount + 1, plural = plural, characters = detected_illegal_chars_string))
+    if len(validity_errors) > 0:
+      print("The following validity errors were detected in {csv}:".format(csv = purl_csv))
+      for error in validity_errors:
+        print(error)
+      sys.exit()
+
     with open(purl_csv, 'r') as read_obj:
         csv_dict_reader = DictReader(read_obj)
         for row in csv_dict_reader:
