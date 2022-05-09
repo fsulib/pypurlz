@@ -44,3 +44,10 @@ purl_domain,purl_id_03,https://www.wikipedia.org/<br/>
 PURL servers don't like spaces or certain special characters in the `id` field (see `create_purls_from_csv.py` for a list of such characters), so avoid these in your `.csv` to help the script run smoothly. Generally, sticking to basic alphanumeric characters and dashes (`-`) or underscores (`_`) is a good guideline to follow. Be sure to double-check your `.csv` before running to ensure no duplicate `id` fields are present, as these duplicates can cause errors in the script and require manual remediation.
 
 Additionally, PURL domains must be created on the server by an admin before minting PURLs within that domain, so be sure to do this before initiating a batch or single jobs.
+
+## using the update scripts
+The `update_single_purl.py` and `update_purls_from_csv.py` are intended to be used when updating the _target_ of an already exisiting PURL. 
+
+To use the `update_single_purl.py` script, enter the command the same as instructed above for an exisiting PURL and simply add the new target URL to the command. This will modify the existing PURL to point to the new target URL. 
+
+Simiarly, to use the `update_purls_from_csv.py` script, create a well-formed csv using existing domain/id pairs and place the new target URL on each line of the `.csv` in the `target` field. This will batch-update all PURLs to redirect to new targets. 
