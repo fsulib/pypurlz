@@ -22,7 +22,7 @@ The `create_single_purl.py` script can be run to mint a single PURL for a digita
 
 Note on updating pre-existing PURLS: to make an existing PURL redirect to a new target URL, enter the existing information for the `--domain` and `--id` options, and simply insert the new target URL for the `--target` option.
 
-The status of the script (either `success` or `failure`) will print to the the `stdout` along with a message confirming the newly minted or updated PURL.
+The status of the script (either `success` or `failure`) will print to the the `stdout` along with a message confirming whether a new PURL was created or just updated.
 
 ### example script for create_single_purl.py
 
