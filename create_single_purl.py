@@ -3,6 +3,7 @@
 import click
 import requests
 import sys
+from urllib.parse import urlparse
 
 @click.command()
 @click.option('--host', help='The PURLZ server we want to connect to')
@@ -34,10 +35,19 @@ def exec(host, username, password, domain, id, target, purl_type, maintainer):
             sys.exit("Host PURL server cannot be reached. Check server status and host information and try again.")
         if authentication_request.url == host +'/docs/loginfailure.html':
             sys.exit("Login credentials not valid. Check username and password and try again.")
+
         purl_status_check = requests.get(host + '/' + domain + '/' + id)
+        response_url = purl_status_check.url
+        response_path = urlparse(response_url).path
+        response_domain =response_url.replace(response_path, '') 
+
         if purl_status_check.status_code == 404:
-            print("PURL does not exist. Minting new PURL. " + host + '/' + domain + '/' + id + " redirects to " + target)
-            session.post(host + '/admin/purl/' + domain + '/' + id  + '?target=' + target + '&type=' + purl_type + '&maintainers=' + maintainer)
+            if host == response_domain:
+                print("PURL does not exist. Minting new PURL. " + host + '/' + domain + '/' + id + " redirects to " + target)
+                session.post(host + '/admin/purl/' + domain + '/' + id  + '?target=' + target + '&type=' + purl_type + '&maintainers=' + maintainer)
+            else:
+                print("PURL already exists. Updating " + host + '/' + domain + '/' + id + " to redirect to " + target )
+                session.put(host + '/admin/purl/' + domain + '/' + id  + '?type=302' + '&seealso=&maintainers=admin' + '&target=' + target)
         if purl_status_check.status_code == 200:
             print("PURL already exists. Updating " + host + '/' + domain + '/' + id + " to redirect to " + target )
             session.put(host + '/admin/purl/' + domain + '/' + id  + '?type=302' + '&seealso=&maintainers=admin' + '&target=' + target)
