@@ -51,8 +51,12 @@ def exec(host, username, password, domain, id, target, purl_type, maintainer):
         if purl_status_check.status_code == 200:
             print("PURL already exists. Updating " + host + '/' + domain + '/' + id + " to redirect to " + target )
             session.put(host + '/admin/purl/' + domain + '/' + id  + '?type=302' + '&seealso=&maintainers=admin' + '&target=' + target)
-        validate_purl = requests.get(host + '/' + domain + '/' + id)
-        if validate_purl.url == target:
+
+        redirect = requests.get(host + '/' + domain + '/' + id)
+        redirect = redirect.url.rstrip('/')
+        print("Target: " + target)
+        print("Redirect: " + redirect)
+        if redirect == target:
             print(host + '/' + domain + '/' + id + " | success")
         else:
             print(host + '/' + domain + '/' + id + " | failure")
